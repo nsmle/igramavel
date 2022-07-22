@@ -3,7 +3,10 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\App;
+use App\Services\InstagramService;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use App\Repositories\InstagramRepository;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -25,6 +28,9 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        App::singleton(InstagramService::class, function ($app) {
+            $instagram = $app->make(InstagramRepository::class);
+            return new InstagramService($instagram);
+        });
     }
 }

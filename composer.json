@@ -1,15 +1,51 @@
 {
-    "name": "laravel/laravel",
+    "name": "nsmle/igramapi",
     "type": "project",
-    "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "description": "An unofficial Instagram RESTful API. easy  to fetch any feed and interact with Instagram (like, follow, etc.) with JWT implementation.",
+    "keywords": [
+        "instagram",
+        "instagram-feed",
+        "instagram-api",
+        "instagram-scraper",
+        "instagram-crawler",
+        "instagram-client",
+        "instagram-photos",
+        "instagram-stories",
+        "instagram-bot",
+        "instagram-post",
+        "instagram-posts",
+        "instagram-downloader",
+        "instagram-private",
+        "instagram-private-api",
+        "instagram-story-downloader",
+        "instagram-private-downloader",
+        "rest-api",
+        "jwt",
+        "php",
+        "laravel"
+    ],
+    "homepage": "https://github.com/nsmle/igramapi",
+    "authors": [
+        {
+          "name": "Fiki Pratama",
+          "email": "fikiproductionofficial@gmail.com"
+        }
+    ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/nsmle/instagram-user-feed"
+        }
+    ],
     "require": {
         "php": "^8.0.2",
+        "firebase/php-jwt": "^6.3",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^2.14.1",
-        "laravel/tinker": "^2.7"
+        "laravel/tinker": "^2.7",
+        "pgrimaud/instagram-user-feed": "master"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
@@ -25,7 +61,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

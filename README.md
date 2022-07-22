@@ -1,64 +1,94 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Igramapi
+An unofficial Instagram RESTful API. easy  to fetch any feed and interact with Instagram (like, follow, etc.) with JWT implementation.
 
-## About Laravel
+> **Warning**
+> This project fully uses the [pgrimaud/instagram-user-feed](https://github.com/pgrimaud/instagram-user-feed) library, which has been modified on [nsmle/instagram-user-feed](https://github.com/nsmle/instagram-user-feed) and has not been merged. Please consider using the [main library](https://github.com/pgrimaud/instagram-user-feed) once the [pull request](https://github.com/pgrimaud/instagram-user-feed/pull/304) is approved and merged.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+# Installation
+```
+git clone https://github.com/nsmle/igramapi.git
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+# Usage
+- Open your terminal and go to your working directory.
+- Clone this repository
+  ```bash
+  git clone https://github.com/nsmle/igramapi.git
+  ```
+- Go to folder
+  ```bash
+  cd igramapi
+  ```
+- Install dependencies
+  ```bash
+  composer install
+  ```
+- Create environment variable
+  ```bash
+  cp .env.example .env
+  ```
+- Generate key inside `.env` file 
+  ```bash
+  php artisan key:generate
+  ```
+- Generate `JWT_SECRET` key in `.env` file
+  ```bash
+  php artisan jwt:generate-key
+  ```
+- Start local server
+  ```bash
+  php artisan serve
+  ```
+- Open link `http://localhost:8000/api` to get all endpoints list on your browser
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+# Endpoints
+| Method      | Endpoint    | Auth        |
+| ----------- | ----------- | ----------- |
+| `GET`       | [/api](https://github.com/nsmle/igramapi#get-all-list-of-api-endpoints) | No |
+| `POST`      | [/api/auth/login](https://github.com/nsmle/igramapi#login-with-instagram-credentials) | No |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+> **Note**
+> Replace `<BASEURL>` in example with your app base url.
 
-## Laravel Sponsors
+#### Get all list of api endpoints.
+  - ENDPOINT
+    ```
+    /api
+    ```
+  - METHOD
+    ```
+    GET
+    ```
+  - EXAMPLE
+    ```bash
+    curl -X GET <BASEURL>/api
+    ```
+#### Login with instagram credentials.
+  - ENDPOINT
+    ```
+    /api/auth/login
+    ```
+  - METHOD
+    ```
+    POST
+    ```
+  - BODY
+    ```json
+    {
+        "username" : "YOUR_INSTAGRAM_USERNAME",
+        "password" : "YOUR_INSTAGRAM_PASSWORD"
+    }
+    ```
+  - EXAMPLE
+    ```bash
+    curl -X POST <BASEURL>/api/auth/login -H "Content-Type: application/json" -d '{"username": "YOUR_INSTAGRAM_USERNAME", "password": "YOUR_INSTAGRAM_PASSWORD"}'
+    ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
 
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Feedback
+I currently made this project for personal purposes. I decided to share it here to help anyone with the same needs.
+If you have any feedback to improve it, You found a bug, You need a new feature/endpoint.
+You can [create an issue](https://github.com/nsmle/igramapi/issues) if needed and feel free to make a suggestion, or [open a PR](https://github.com/nsmle/igramapi/pulls)!

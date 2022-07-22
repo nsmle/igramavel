@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,33 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('guest')->group(function () {
+    // Get all api endpoints.
+    Route::get('/', function (Request $request) {
+        return response()->json([
+            'status'   => 'Ok',
+            'code'     => 200,
+            'message'  => 'Please see all endpoints bellow.',
+            'endpoint' => get_all_api_endpoint()
+        ], 200);
+    });
+
+    // Login with instagram credentials.
+    Route::post('/auth/login', [AuthController::class, 'login'])->name('api.login');
+});
+
+// Handle route/method not found.
+Route::fallback(function (Request $request) {
+    return response()->json([
+        'status'  => 'Error',
+        'code'    => 404,
+        'message' => 'Endpoint not Found.',
+        'data'    => [
+            'note' => 'Please see /api for list all api endpoints.',
+            'example' => [
+                'url'    => url('/api'),
+                'method' => 'GET'
+            ]
+        ]
+    ], 404);
 });
