@@ -28,6 +28,8 @@ Route::middleware('guest')->group(function () {
 
     // Login with instagram credentials.
     Route::post('/auth/login', [AuthController::class, 'login'])->name('api.login');
+    // Login with instagram session id.
+    Route::post('/auth/login/alternative', [AuthController::class, 'loginAlternative'])->name('api.login.alternative');
 });
 
 // Handle route/method not found.

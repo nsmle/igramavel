@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Repositories\InstagramRepository;
 use Illuminate\Support\Facades\Crypt;
-use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\{SetCookie, CookieJar};
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Firebase\JWT\SignatureInvalidException;
@@ -37,13 +37,13 @@ class InstagramService
     public function getSelfId(): string
     {
         if (!empty($this->user)) {
-            return $this->user->id;
+            return (string) $this->user->id;
         }
 
         $session = $this->Instagram->getSession();
         $userId = $session->getCookieByName('ds_user_id')->getValue();
 
-        return $userId;
+        return (string) $userId;
     }
 
     /*
@@ -56,11 +56,53 @@ class InstagramService
      */
     public function login(string $username, string $password): string
     {
-        // Login
+        // Login with instagram credentials
         $this->Instagram->login($username, $password);
 
+        // Generate jwt token after login
+        $token = $this->generateToken();
+
+        return $token;
+    }
+
+    /*
+     * Login into instagram with cookie session id
+     *
+     * @param array $cookie
+     *
+     * @return string
+     */
+    public function loginWithCookie(array $cookie): string
+    {
+        $cookie = new SetCookie(array_merge($cookie, [
+            'Name'     => 'sessionid',
+            'Max-Age'  => '31536000',
+            "Secure"   => true,
+            "Discard"  => false,
+            "HttpOnly" => true,
+        ]));
+
+        $cookieJar = new CookieJar(false, [$cookie]);
+
+        // Login with cookies
+        $this->Instagram->loginWithCookies($cookieJar);
+
+        // Generate jwt token after login with cookie
+        $token = $this->generateToken();
+
+        return $token;
+    }
+
+    /*
+     * Generate token
+     *
+     * @return string
+     */
+    public function generateToken(): string
+    {
         // Get data user login
         $me = $this->Instagram->getProfileById($this->getSelfId());
+        $this->user = (object) $me->toArray();
 
         // Get instagram  session id from login with credentials
         $sessionId = $this->Instagram->getSession()->getCookieByName('sessionId');
@@ -74,8 +116,8 @@ class InstagramService
             'session' => Crypt::encrypt([
                 'user'    => [
                     'id'       => $me->getId(),
-                    'name'     => $me->getFullName(),
-                    'username' => $me->getUserName(),
+                    'fullName'     => $me->getFullName(),
+                    'userName' => $me->getUserName(),
                 ],
                 'cookies' => $sessionId->toArray()
             ])
@@ -115,5 +157,4 @@ class InstagramService
             ];
         }
     }
-    
 }

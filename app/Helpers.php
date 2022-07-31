@@ -19,6 +19,17 @@ if (!function_exists('get_all_api_endpoint')) {
                     'password' => 'YOUR_INSTAGRAM_PASSWORD'
                 ]
             ],
+            'login_with_instagram_cookie_sessionid' => [
+                'url'      => url('/api/auth/login/alternative'),
+                'method'   => 'POST',
+                'body'     => [
+                    'name'    => 'sessionid',
+                    'value'   => 'YOUR_INSTAGRAM_COOKIE_SESSIONID',
+                    'domain'  => 'YOUR_INSTAGRAM_COOKIE_SESSIONID_DOMAIN|.instagram.com',
+                    'path'    => 'YOUR_INSTAGRAM_COOKIE_SESSIONID_PATH|/',
+                    'expires' => 'YOUR_INSTAGRAM_COOKIE_SESSIONID_EXPIRES',
+                ]
+            ],
             'get_profile_self' => [
                 'url'      => url('/api/profile'),
                 'method'   => 'GET',
