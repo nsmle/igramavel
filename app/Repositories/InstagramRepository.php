@@ -5,10 +5,27 @@ namespace App\Repositories;
 use Instagram\Api;
 use Instagram\Auth\{Checkpoint\ImapClient, Login, Session};
 use Instagram\Exception\{InstagramException, InstagramAuthException};
-use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\{Client, ClientInterface, Cookie\CookieJar};
+use Psr\Cache\CacheItemPoolInterface;
 
 class InstagramRepository extends Api
 {
+    /**
+     * Overide \Instagram\Api::__construct()
+     * 
+     * @param CacheItemPoolInterface $cachePool
+     * @param ClientInterface|null $client
+     * @param int|null $challengeDelay
+     */
+    public function __construct(CacheItemPoolInterface $cachePool = null, ClientInterface $client = null, ?int $challengeDelay = 3)
+    {
+        $this->cachePool = $cachePool;
+        $this->client = $client ?: new Client([
+            'allow_redirects' => true
+        ]);
+        $this->challengeDelay = $challengeDelay;
+    }
+
     /*
      * Overide \Instagram\Api::login()
      * 

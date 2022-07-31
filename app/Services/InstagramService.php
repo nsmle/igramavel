@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\InstagramRepository;
+use Illuminate\Support\Facades\Crypt;
 use GuzzleHttp\Cookie\CookieJar;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -57,28 +58,29 @@ class InstagramService
     {
         // Login
         $this->Instagram->login($username, $password);
-        
+
         // Get data user login
         $me = $this->Instagram->getProfileById($this->getSelfId());
-        
+
+        // Get instagram  session id from login with credentials
+        $sessionId = $this->Instagram->getSession()->getCookieByName('sessionId');
+
         // Generate Json Web Token
         $jwt = JWT::encode([
-            'user' => [
-                'id'           => $me->getId(),
-                'name'         => $me->getFullName(),
-                'username'     => $me->getUserName(),
-                'biography'    => $me->getBiography(),
-                'followers'    => $me->getFollowers(),
-                'following'    => $me->getFollowing(),
-                'external_url' => $me->getExternalUrl(),
-                'private'      => $me->isPrivate(),
-                'verified'     => $me->isVerified(),
-            ],
-            'cookies' => [
-                $this->Instagram->getSession()->getCookieByName('sessionId')->toArray()
-            ]
+            "iss" => request()->getHost(),
+            "sub" => $me->getId(),
+            "iat" => time(),
+            "exp" => $sessionId->getExpires(),
+            'session' => Crypt::encrypt([
+                'user'    => [
+                    'id'       => $me->getId(),
+                    'name'     => $me->getFullName(),
+                    'username' => $me->getUserName(),
+                ],
+                'cookies' => $sessionId->toArray()
+            ])
         ], env('JWT_SECRET'), 'HS256');
-        
+
         return $jwt;
     }
 
@@ -94,13 +96,14 @@ class InstagramService
         try {
             // Decode and get payload of Json Web Token
             $payload = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
-            
-            $this->user = $payload->user;
-            
-            $cookies = $payload->cookies;
+
+            $session = Crypt::decrypt($payload->session);
+            $this->user = $session->user;
+
+            $cookies = $session->cookies;
             $cookieJar = new CookieJar(false, $cookies);
             $this->Instagram->loginWithCookies($cookieJar);
-            
+
             return [
                 'valid'  => true,
                 'message' => 'authorized'
