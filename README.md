@@ -46,7 +46,7 @@ If you like and find this app useful, please give your support by starring in th
       </a>
     </li>
     <li>
-      <a href="https://www.paypal.me/pgrimaud">
+      <a href="https://www.paypal.me/grimaudpierre">
         <p>Paypal<p>
       </a>
     </li>
@@ -97,10 +97,12 @@ git clone https://github.com/nsmle/igramapi.git
 | `GET`       | [/api](https://github.com/nsmle/igramapi#get-all-list-of-api-endpoints) | No |
 | `POST`      | [/api/auth/login](https://github.com/nsmle/igramapi#login-with-instagram-credentials) | No |
 | `POST`      | [/api/auth/login/alternative](https://github.com/nsmle/igramapi#login-with-instagram-cookie-sessionid) | No |
+| `GET`       | [/api/profile](https://github.com/nsmle/igramapi#get-logged-in-user-profile) | Yes |
+| `GET`       | [/api/profile/{userId}](https://github.com/nsmle/igramapi#get-profile-by-user-id-or-username) | Yes |
 
 > **Note**
 > Replace `<BASEURL>` in example with your app base url.
-> Or you can also replace it with [https://igramapi.herokuapp.com/api](https://igramapi.herokuapp.com/api) as an illustration when in production.
+> Or you can also replace it with [https://igramapi.herokuapp.com/](https://igramapi.herokuapp.com/) as an illustration when in production.
 
 #### Get all list of api endpoints.
   - ENDPOINT
@@ -115,6 +117,7 @@ git clone https://github.com/nsmle/igramapi.git
     ```bash
     curl -X GET <BASEURL>/api
     ```
+
 #### Login with instagram credentials.
   - ENDPOINT
     ```
@@ -135,6 +138,7 @@ git clone https://github.com/nsmle/igramapi.git
     ```bash
     curl -X POST <BASEURL>/api/auth/login -H "Content-Type: application/json" -d '{"username": "YOUR_INSTAGRAM_USERNAME", "password": "YOUR_INSTAGRAM_PASSWORD"}'
     ```
+
 #### Login with instagram cookie sessionid.
   - ENDPOINT
     ```
@@ -163,6 +167,34 @@ git clone https://github.com/nsmle/igramapi.git
   - EXAMPLE
     ```bash
     curl -X POST <BASEURL>/api/auth/login/alternative -H "Content-Type: application/json" -d '{"name": "sessionid", "value": "YOUR_INSTAGRAM_SESSIONID_VALUE", "domain": ".instagram.com", "path": "/", "expires": "YOUR_INSTAGRAM_SESSIONID_EXPIRES"}'
+    ```
+
+#### Get logged in user profile.
+  - ENDPOINT
+    ```
+    /api/profile
+    ```
+  - METHOD
+    ```
+    GET
+    ```
+  - EXAMPLE
+    ```bash
+    curl -X GET <BASEURL>/api/profile -H "Authorization: Bearer {token}" -H "Content-Type: application/json"
+    ```
+
+#### Get profile by user id or username.
+  - ENDPOINT
+    ```
+    /api/profile/{userId|username}
+    ```
+  - METHOD
+    ```
+    GET
+    ```
+  - EXAMPLE
+    ```bash
+    curl -X GET <BASEURL>/api/profile/{userId|username} -H "Authorization: Bearer {token}" -H "Content-Type: application/json"
     ```
 
 

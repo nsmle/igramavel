@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Repositories\InstagramRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Crypt;
 use GuzzleHttp\Cookie\{SetCookie, CookieJar};
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Firebase\JWT\SignatureInvalidException;
+use Instagram\Utils\CacheResponse;
 
 class InstagramService
 {
@@ -27,6 +29,10 @@ class InstagramService
     public function __construct(InstagramRepository $instagram)
     {
         $this->Instagram = $instagram;
+
+        if (!empty(request()->header('user-agent'))) {
+            $this->Instagram->setUserAgent(request()->header('user-agent'));
+        }
     }
 
     /*
@@ -105,7 +111,8 @@ class InstagramService
         $this->user = (object) $me->toArray();
 
         // Get instagram  session id from login with credentials
-        $sessionId = $this->Instagram->getSession()->getCookieByName('sessionId');
+        $session   = $this->Instagram->getSession();
+        $sessionId = $session->getCookieByName('sessionId');
 
         // Generate Json Web Token
         $jwt = JWT::encode([
@@ -119,7 +126,10 @@ class InstagramService
                     'fullName'     => $me->getFullName(),
                     'userName' => $me->getUserName(),
                 ],
-                'cookies' => $sessionId->toArray()
+                'cookies' => [
+                    $session->getCookieByName('sessionid')->toArray(),
+                    $session->getCookieByName('csrftoken')->toArray()
+                ]
             ])
         ], env('JWT_SECRET'), 'HS256');
 
@@ -140,11 +150,14 @@ class InstagramService
             $payload = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
 
             $session = Crypt::decrypt($payload->session);
-            $this->user = $session->user;
+            $this->user = (object) $session['user'];
 
-            $cookies = $session->cookies;
+            $cookies = $session['cookies'];
             $cookieJar = new CookieJar(false, $cookies);
-            $this->Instagram->loginWithCookies($cookieJar);
+
+            if ($cookieJar->getCookieByName('sessionId')->getExpires() > time()) {
+                $this->Instagram->loginWithCookies($cookieJar);
+            }
 
             return [
                 'valid'  => true,
@@ -156,5 +169,39 @@ class InstagramService
                 'message' => $e->getMessage()
             ];
         }
+    }
+
+    /*
+     * Generate json response
+     *
+     * @param array $data
+     * @param array $options
+     *
+     * @return 
+     */
+    public function jsonResponse(array $data, array $options)
+    {
+        $response = CacheResponse::getResponse();
+        $session  = $this->Instagram->getSession();
+
+        return response()->json([
+            'status'  => $options['status'] ?? $response->getReasonPhrase(),
+            'code'    => $options['code'] ?? $response->getStatusCode(),
+            'message' => $options['message'] ?? '',
+            'data'    => $data
+        ], $options['code'] ?? $response->getStatusCode())->withHeaders([
+            'x-ig-header'  => collect($response->getHeaders())->toJson(),
+            'x-ig-session' => collect($session->toArray())->toJson()
+        ])->cookie(
+            'token',
+            $this->generateToken(),
+            now()->parse(
+                $session->getCookieByName('sessionId')->getExpires()
+            )->diffInMinutes(),
+            '/',
+            request()->getHost(),
+            request()->secure(),
+            true
+        );
     }
 }

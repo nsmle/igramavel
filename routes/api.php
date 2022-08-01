@@ -2,7 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\{
+    AuthController,
+    ProfileController
+};
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +33,13 @@ Route::middleware('guest')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login'])->name('api.login');
     // Login with instagram session id.
     Route::post('/auth/login/alternative', [AuthController::class, 'loginAlternative'])->name('api.login.alternative');
+});
+
+Route::middleware('auth.jwt')->group(function () {
+    // Get profile of user login
+    Route::get('/profile', [ProfileController::class, 'getProfileSelf'])->name('api.profile');
+    // Get profile by user id
+    Route::get('/profile/{userId}', [ProfileController::class, 'getProfileById'])->name('api.profile.by_user_id');
 });
 
 // Handle route/method not found.

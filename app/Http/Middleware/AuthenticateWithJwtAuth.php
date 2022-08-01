@@ -31,8 +31,10 @@ class AuthenticateWithJwtAuth
      */
     public function handle(Request $request, Closure $next)
     {
-        $token = $request->bearerToken() ?? $request->input('token');
-        
+        $token = $request->bearerToken() ??
+                 $request->input('token') ??
+                 $request->cookie('token');
+
         if (!$token) {
             $exampleRequest = [
                 'url'    => url($request->getRequestUri()),
@@ -41,11 +43,11 @@ class AuthenticateWithJwtAuth
                     'Authorization' => "Bearer <token>"
                 ]
             ];
-            
+
             if ($request->isMethod('post')) {
                 $exampleRequest['body'] = $request->input();
             }
-            
+
             return response()->json([
                 'status'  => 'Error',
                 'code'    => 401,
@@ -53,9 +55,9 @@ class AuthenticateWithJwtAuth
                 'example'    => $exampleRequest
             ], 401);
         }
-        
+
         $authorized = $this->instagram->authorize($token);
-        
+
         if (!$authorized['valid']) {
             return response()->json([
                 'status'  => 'Error',
@@ -66,7 +68,7 @@ class AuthenticateWithJwtAuth
                 ]
             ], 401);
         }
-        
+
         return $next($request);
     }
 }

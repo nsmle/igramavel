@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\{Request, JsonResponse};
+use Illuminate\Support\Facades\{App, Validator};
 use App\Services\InstagramService;
 
 class AuthController extends Controller
@@ -41,8 +39,8 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'status'  => 'Error',
-                'code'    => 404,
+                'status'  => 'Bad Request',
+                'code'    => 400,
                 'message' => 'Please login with your instagram credentials.',
                 'errors'  => [
                     'username' => $validator->valid()['username'] ??
@@ -50,7 +48,7 @@ class AuthController extends Controller
                     'password' => $validator->valid()['password'] ??
                                   'YOUR_INSTAGRAM_PASSWORD'
                 ]
-            ], 404);
+            ], 400);
         }
 
         // Valid Credentials
@@ -72,14 +70,11 @@ class AuthController extends Controller
             ], 401);
         }
 
-        return response()->json([
-            'status'  => 'Ok',
-            'code'    => 200,
-            'message' => "Logged in as {$this->instagram->user->fullName}",
-            'data'  => [
-                'token' => $token
-            ]
-        ], 200);
+        return $this->instagram->jsonResponse([
+            'token' => $token
+        ], [
+            "message" => "Logged in as {$this->instagram->user->fullName}"
+        ]);
     }
 
     /**
@@ -102,8 +97,8 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'status'  => 'Error',
-                'code'    => 404,
+                'status'  => 'Bad Request',
+                'code'    => 400,
                 'message' => 'Please login with your instagram cookie sessionid.',
                 'errors'  => [
                     'name'    => $validator->valid()['name'] == 'sessionid' ?
@@ -118,7 +113,7 @@ class AuthController extends Controller
                     'expires' => $validator->valid()['expires'] ??
                                  'YOUR_INSTAGRAM_SESSIONID_EXPIRES',
                 ]
-            ], 404);
+            ], 400);
         }
 
         // Valid cookie
@@ -135,7 +130,7 @@ class AuthController extends Controller
             $token = $this->instagram->loginWithCookie($cookie);
         } catch (\Exception $e) {
             return response()->json([
-                'status'  => 'Error',
+                'status'  => 'Unauthorized',
                 'code'    => 401,
                 'message' => $e->getMessage(),
                 'errors'  => [
@@ -146,13 +141,10 @@ class AuthController extends Controller
             ], 401);
         }
 
-        return response()->json([
-            'status'  => 'Ok',
-            'code'    => 200,
-            'message' => "Logged in as {$this->instagram->user->fullName}",
-            'data'  => [
-                'token' => $token
-            ]
-        ], 200);
+        return $this->instagram->jsonResponse([
+            'token' => $token
+        ], [
+            "message" => "Logged in as {$this->instagram->user->fullName}"
+        ]);
     }
 }

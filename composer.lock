@@ -2160,7 +2160,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nsmle/instagram-user-feed",
-                "reference": "0c77e57b2cecda4aaee2e8dbf3ebeaaffb1f938c"
+                "reference": "0834676d81b5a4bf8a99095adf53ad271774784f"
             },
             "require": {
                 "ext-curl": "*",
@@ -2213,7 +2213,7 @@
                 "sdk",
                 "social"
             ],
-            "time": "2022-07-31T10:15:12+00:00"
+            "time": "2022-08-01T02:29:11+00:00"
         },
         {
             "name": "phpoption/phpoption",
