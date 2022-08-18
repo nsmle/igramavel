@@ -72,6 +72,7 @@ git clone https://github.com/nsmle/igramapi.git
 | `POST`      | [/api/auth/login/alternative](https://github.com/nsmle/igramapi#login-with-instagram-cookie-sessionid) | No |
 | `GET`       | [/api/profile](https://github.com/nsmle/igramapi#get-logged-in-user-profile) | Yes |
 | `GET`       | [/api/profile/{userId}](https://github.com/nsmle/igramapi#get-profile-by-user-id-or-username) | Yes |
+| `GET`       | [/api/reels/{userId}](https://github.com/nsmle/igramapi#get-reels-of-user) | Yes |
 
 > **Note**
 > Replace `<BASEURL>` in example with your app base url.
@@ -169,6 +170,25 @@ git clone https://github.com/nsmle/igramapi.git
   - EXAMPLE
     ```bash
     curl -X GET "<BASEURL>/api/profile/{userId|username}" -H "Authorization: Bearer {token}" -H "Content-Type: application/json"
+    ```
+
+#### Get reels of user.
+  - ENDPOINT
+    - get reels
+      ```
+      /api/reels/{userId|username}
+      ```
+    - get next reels
+      ```
+      /api/reels/{userId|username}?cursor={maxId}
+      ```
+  - METHOD
+    ```
+    GET
+    ```
+  - EXAMPLE
+    ```bash
+    curl -X GET "<BASEURL>/api/reels/{userId|username}" -H "Authorization: Bearer {token}" -H "Content-Type: application/json"
     ```
 
 
