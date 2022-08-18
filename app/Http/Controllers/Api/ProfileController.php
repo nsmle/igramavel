@@ -81,7 +81,7 @@ class ProfileController extends Controller
      * @return \Instagram\Model\Profile|string
      * @throw  \Exception
      */
-    public function getProfileById(Request $request, mixed $userId): jsonResponse
+    public function getProfileById(Request $request, mixed $userId): JsonResponse
     {
         try {
             if (is_numeric($userId)) {

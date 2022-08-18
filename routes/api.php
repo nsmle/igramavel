@@ -4,7 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\{
     AuthController,
-    ProfileController
+    ProfileController,
+    ReelsController
 };
 
 /*
@@ -40,6 +41,8 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('/profile', [ProfileController::class, 'getProfileSelf'])->name('api.profile');
     // Get profile by user id
     Route::get('/profile/{userId}', [ProfileController::class, 'getProfileById'])->name('api.profile.by_user_id');
+    // Get Reels of user
+    Route::get('/reels/{userId}', ReelsController::class)->name('api.reels');
 });
 
 // Handle route/method not found.
