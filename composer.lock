@@ -2152,16 +2152,16 @@
         },
         {
             "name": "pgrimaud/instagram-user-feed",
-            "version": "6.16.1",
+            "version": "6.16.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pgrimaud/instagram-user-feed.git",
-                "reference": "e72571ccafc7f9ace393bcddd4cc8503c8f9953e"
+                "reference": "7e9e25010183ebf4452a45c4a14bb965d83b0fb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pgrimaud/instagram-user-feed/zipball/e72571ccafc7f9ace393bcddd4cc8503c8f9953e",
-                "reference": "e72571ccafc7f9ace393bcddd4cc8503c8f9953e",
+                "url": "https://api.github.com/repos/pgrimaud/instagram-user-feed/zipball/7e9e25010183ebf4452a45c4a14bb965d83b0fb1",
+                "reference": "7e9e25010183ebf4452a45c4a14bb965d83b0fb1",
                 "shasum": ""
             },
             "require": {
@@ -2212,7 +2212,7 @@
             ],
             "support": {
                 "issues": "https://github.com/pgrimaud/instagram-user-feed/issues",
-                "source": "https://github.com/pgrimaud/instagram-user-feed/tree/6.16.1"
+                "source": "https://github.com/pgrimaud/instagram-user-feed/tree/6.16.2"
             },
             "funding": [
                 {
@@ -2224,7 +2224,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-08-11T10:06:41+00:00"
+            "time": "2022-08-18T14:30:21+00:00"
         },
         {
             "name": "phpoption/phpoption",
