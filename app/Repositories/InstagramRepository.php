@@ -65,9 +65,9 @@ class InstagramRepository extends Api
         $session = collect($session)->map(function ($cookie) {
             return collect($cookie)->toArray();
         });
-        
+
         $cookies = new CookieJar(false, $session->toArray());
-        
+
         $this->session = new Session($cookies);
     }
 }
