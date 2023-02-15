@@ -6,10 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\{Request, JsonResponse};
 use Illuminate\Support\Facades\App;
 use App\Services\InstagramService;
-use Instagram\Model\Profile;
-use Instagram\Exception\InstagramFetchException;
-use Instagram\Utils\CacheResponse;
-use GuzzleHttp\Exception\ClientException;
 
 class ProfileController extends Controller
 {

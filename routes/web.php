@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\Yaml\Yaml;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +15,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('swagger');
+})->name('homepage');
+
+Route::get('/docs/open-api.{filename}', function ($filename) {
+
+    $docsFile = resource_path('docs/open-api.yaml');
+
+    if ($filename == 'json') {
+        return response()->json(Yaml::parseFile($docsFile));
+    } else if ($filename == 'yaml') {
+        return response()->file($docsFile, ['Content-Type' => 'applicaton/yaml']);
+    }
+
+    return abort(404);
 });
