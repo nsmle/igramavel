@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\{
     AuthController,
     ProfileController,
-    ReelsController
+    ReelsController,
+    FollowController
 };
 
 /*
@@ -19,30 +20,85 @@ use App\Http\Controllers\Api\{
 |
 */
 
+function CommingSoon()
+{
+    return response()->json([
+        'status'  => 'OK',
+        'code'    => 200,
+        'message' => 'Comming Soon!',
+        'data'    => [
+            'note' => 'Please see available api endpoints.',
+            'example' => [
+                'url'    => url(config('app.url')),
+                'method' => 'GET'
+            ]
+        ]
+    ], 200);
+}
+
 Route::middleware('guest')->group(function () {
     // Get all api endpoints.
     Route::get('/', function (Request $request) {
-        return response()->json([
-            'status'   => 'Ok',
-            'code'     => 200,
-            'message'  => 'Please see all endpoints bellow.',
-            'endpoint' => get_all_api_endpoint()
-        ], 200);
+        return redirect()->route('homepage');
     });
 
-    // Login with instagram credentials.
-    Route::post('/auth/login', [AuthController::class, 'login'])->name('api.login');
-    // Login with instagram session id.
-    Route::post('/auth/login/alternative', [AuthController::class, 'loginAlternative'])->name('api.login.alternative');
+    Route::prefix('auth')->group(function () {
+        // Login with instagram credentials.
+        Route::post('/login', [AuthController::class, 'login'])->name('login');
+        // Login with instagram session id.
+        Route::post('/login/alternative', [AuthController::class, 'loginAlternative'])->name('login.alternative');
+    })->name('auth.');
 });
 
-Route::middleware('auth.jwt')->group(function () {
-    // Get profile of user login
-    Route::get('/profile', [ProfileController::class, 'getProfileSelf'])->name('api.profile');
-    // Get profile by user id
-    Route::get('/profile/{userId}', [ProfileController::class, 'getProfileById'])->name('api.profile.by_user_id');
-    // Get Reels of user
-    Route::get('/reels/{userId}', ReelsController::class)->name('api.reels');
+Route::middleware(['auth.jwt', 'validate.username'])->group(function () {
+
+    Route::prefix('user')->group(function () {
+        Route::name('profile.')->group(function () {
+            // Get profile of user login
+            Route::get('/', [ProfileController::class, 'getProfileSelf'])->name('self');
+            // Get profile by user id
+            Route::get('/{userId}', [ProfileController::class, 'getProfileById'])->name('byUserId');
+        });
+
+        Route::name('follow.')->group(function () {
+            // Follow a user 
+            Route::post("/{userId}/follow", [FollowController::class, 'follow'])->name('follow');
+            Route::post("/{userId}/unfollow", [FollowController::class, 'unfollow'])->name('unfollow');
+        });
+    })->name('user.');
+
+    Route::prefix('reels')->group(function () {
+        // Get Reels of user
+        Route::get('/{userId}', [ReelsController::class, 'feed'])->name('reels');
+    })->name('reels.');
+
+
+    /**
+     * COMING SOON!
+     */
+    Route::prefix('post')->group(function () {
+        Route::get("/{userId}", function () {
+            return CommingSoon();
+        })->name('posts');
+        Route::get("/{userId}/tags", function () {
+            return CommingSoon();
+        })->name('tags');
+        Route::get("/{shortCode}/detail", function () {
+            return CommingSoon();
+        })->name('details');
+        Route::get("/{shortCode}/comment", function () {
+            return CommingSoon();
+        })->name('comments');
+        Route::post("/{shortCode}/comment", function () {
+            return CommingSoon();
+        })->name('comment.post');
+        Route::post("/{shortCode}/like", function () {
+            return CommingSoon();
+        })->name('like');
+        Route::post("/{shortCode}/unlike", function () {
+            return CommingSoon();
+        })->name('unlike');
+    })->name('post.');
 });
 
 // Handle route/method not found.
@@ -52,9 +108,9 @@ Route::fallback(function (Request $request) {
         'code'    => 404,
         'message' => 'Endpoint not Found.',
         'data'    => [
-            'note' => 'Please see /api for list all api endpoints.',
+            'note' => 'Please see lists api endpoints.',
             'example' => [
-                'url'    => url('/api'),
+                'url'    => url(config('app.url')),
                 'method' => 'GET'
             ]
         ]
