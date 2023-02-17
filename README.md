@@ -61,34 +61,35 @@ git clone https://github.com/nsmle/igramapi.git
   ```bash
   php artisan serve
   ```
-- Open link `http://localhost:8000/v1` to get all endpoints list on your browser
+- Open link `http://localhost:8000/` to see available endpoints list
 
-## Documentation
-Coming soon!
+Please see your app [BASEURL](https://github.com/nsmle/igramapi/blob/main/.env.example#L5) to see documentations, or you can see [https://igramapi.fiki.tech/](https://igramapi.fiki.tech/). Or you can also read the [Endpoints](https://github.com/nsmle/igramapi#endpoints) bellow.
 
 ## Endpoints
+See your BASEURL and custom your [APP_URL](https://github.com/nsmle/igramapi/blob/main/.env.example#L5) in `.env` file.
+
 #### Base API Url
 ```bash
-http://<BASEURL>/v1
+<BASEURL>/v1
 ```
-
-`v1` is semantic version of this application in [.env](https://github.com/nsmle/igramapi/blob/main/.env.example#L6).
+`v1` is semantic version of this application in [.env](https://github.com/nsmle/igramapi/blob/main/.env.example#L6) file.
 
 #### Paths
 | Method      | Endpoint    | Auth        |
 | ----------- | ----------- | ----------- |
-| `GET`       | [/](https://github.com/nsmle/igramapi#get-all-list-of-api-endpoints) | No |
 | `POST`      | [/auth/login](https://github.com/nsmle/igramapi#login-with-instagram-credentials) | No |
-| `POST`      | [/auth/login/alternative](https://github.com/nsmle/igramapi#login-with-instagram-cookie-sessionid) | No |
-| `GET`       | [/profile](https://github.com/nsmle/igramapi#get-logged-in-user-profile) | Yes |
-| `GET`       | [/profile/{userId}](https://github.com/nsmle/igramapi#get-profile-by-user-id-or-username) | Yes |
+| `POST`      | [/auth/login/alternative](https://github.com/nsmle/igramapi#login-with-instagram-cookie-session-id) | No |
+| `GET`       | [/user](https://github.com/nsmle/igramapi#get-logged-in-user-profile) | Yes |
+| `GET`       | [/user/{userId}](https://github.com/nsmle/igramapi#get-profile-by-user-id-or-username) | Yes |
+| `POST`      | [/user/{userId}/follow](https://github.com/nsmle/igramapi#follow-user) | Yes |
+| `POST`      | [/user/{userId}/unfollow](https://github.com/nsmle/igramapi#unfollow-user) | Yes |
 | `GET`       | [/reels/{userId}](https://github.com/nsmle/igramapi#get-reels-of-user) | Yes |
 
 > **Note**
 > Replace `<BASEAPIURL>` in example with your app [base api url](https://github.com/nsmle/igramapi#base-api-url).
 > You can also replace it with [https://igramapi.fiki.tech/v1](https://igramapi.fiki.tech/v1) as an illustration when in production.
 >
-> You can also send jwt token via cookie instead of token header. E.g in [Curl](https://curl.se/):
+> You can also send jwt token via cookie/query instead of token header. E.g in [Curl](https://curl.se/docs/http-cookies.html):
 > ```bash
 > curl -X <METHOD> "<BASEURL>/<VERSION>/<PATH>"
 >      -H "Content-Type: <CONTENT_TYPE>"
@@ -97,75 +98,62 @@ http://<BASEURL>/v1
 > ```
 > The jwt token contains the Instagram session id, csrf token cookie and along with some other information.
 
-#### Get all list of api endpoints.
-  - ENDPOINT
-    ```
-    /
-    ```
-  - METHOD
-    ```
-    GET
-    ```
-  - EXAMPLE
-    ```bash
-    curl -X GET "<BASEAPIURL>"
-    ```
 
 #### Login with instagram credentials.
-  - ENDPOINT
-    ```
-    /auth/login
-    ```
-  - METHOD
-    ```
-    POST
-    ```
-  - BODY
+- ENDPOINT
+  ```
+  /auth/login
+  ```
+- METHOD
+  ```
+  POST
+  ```
+- BODY
+  ```json
+  {
+      "username" : "YOUR_INSTAGRAM_USERNAME",
+      "password" : "YOUR_INSTAGRAM_PASSWORD"
+  }
+  ```
+- EXAMPLE
+  ```bash
+  curl -X POST "<BASEAPIURL>/auth/login" -H "Content-Type: application/json" -d '{ "username": "YOUR_INSTAGRAM_USERNAME", "password": "YOUR_INSTAGRAM_PASSWORD" }'
+  ```
+
+#### Login with instagram cookie session id.
+- ENDPOINT
+  ```
+  /auth/login/alternative
+  ```
+- METHOD
+  ```
+  POST
+  ```
+- BODY
+  - Required
     ```json
     {
-        "username" : "YOUR_INSTAGRAM_USERNAME",
-        "password" : "YOUR_INSTAGRAM_PASSWORD"
+        "value"   : "YOUR_INSTAGRAM_SESSIONID_VALUE",
+        "expires" : "YOUR_INSTAGRAM_SESSIONID_EXPIRES"
     }
     ```
-  - EXAMPLE
+  - Optional
+    ```json
+    {
+        "name": "sessionid",
+        "domain"  : "YOUR_INSTAGRAM_SESSIONID_DOMAIN | .instagram.com",
+        "path": "YOUR_INSTAGRAM_SESSIONID_PATH | /",
+    }
+    ```
+- EXAMPLE
     ```bash
-    curl -X POST "<BASEAPIURL>/auth/login" -H "Content-Type: application/json" -d '{"username": "YOUR_INSTAGRAM_USERNAME", "password": "YOUR_INSTAGRAM_PASSWORD"}'
-    ```
-
-#### Login with instagram cookie sessionid.
-  - ENDPOINT
-    ```
-    /auth/login/alternative
-    ```
-  - METHOD
-    ```
-    POST
-    ```
-  - BODY
-    - Required
-       ```json
-       {
-           "value"   : "YOUR_INSTAGRAM_SESSIONID_VALUE",
-           "expires" : "YOUR_INSTAGRAM_SESSIONID_EXPIRES"
-       }
-       ```
-    - Optional
-       ```json
-       {
-           "name"    : "sessionid",
-           "domain"  : "YOUR_INSTAGRAM_SESSIONID_DOMAIN | .instagram.com",
-           "path"    : "YOUR_INSTAGRAM_SESSIONID_PATH | /",
-       }
-       ```
-  - EXAMPLE
-    ```bash
-    curl -X POST "<BASEAPIURL>/auth/login/alternative" -H "Content-Type: application/json" -d '{"name": "sessionid", "value": "YOUR_INSTAGRAM_SESSIONID_VALUE", "domain": ".instagram.com", "path": "/", "expires": "YOUR_INSTAGRAM_SESSIONID_EXPIRES"}'
+    curl -X POST "<BASEAPIURL>/auth/login/alternative" -H "Content-Type: application/json" -d '{ "name": "sessionid", "value": "YOUR_INSTAGRAM_SESSIONID_VALUE", "domain": ".instagram.com", "path": "/", "expires": "YOUR_INSTAGRAM_SESSIONID_EXPIRES" }'
     ```
 
 #### Get logged in user profile.
   - ENDPOINT
     ```
-    /profile
+    /user
     ```
   - METHOD
     ```
@@ -173,13 +161,13 @@ http://<BASEURL>/v1
     ```
   - EXAMPLE
     ```bash
-    curl -X GET "<BASEAPIURL>/profile" -H "Authorization: Bearer {token}" -H "Content-Type: application/json"
+    curl -X GET "<BASEAPIURL>/user" -H "Authorization: Bearer {token}" -H "Content-Type: application/json"
     ```
 
 #### Get profile by user id or username.
   - ENDPOINT
     ```
-    /profile/{userId|username}
+    /user/{userId|username}
     ```
   - METHOD
     ```
@@ -187,7 +175,33 @@ http://<BASEURL>/v1
     ```
   - EXAMPLE
     ```bash
-    curl -X GET "<BASEAPIURL>/profile/{userId|username}" -H "Authorization: Bearer {token}" -H "Content-Type: application/json"
+    curl -X GET "<BASEAPIURL>/user/{userId|username}" -H "Authorization: Bearer {token}" -H "Content-Type: application/json"
+
+#### Follow a user.
+  - ENDPOINT
+    ```
+    /user/{userId|username}/follow
+    ```
+  - METHOD
+    ```
+    POST
+    ```
+  - EXAMPLE
+    ```bash
+    curl -X GET "<BASEAPIURL>/user/{userId|username}/follow" -H "Authorization: Bearer {token}" -H "Content-Type: application/json"
+
+#### Unfollow a user.
+  - ENDPOINT
+    ```
+    /user/{userId|username}/unfollow
+    ```
+  - METHOD
+    ```
+    POST
+    ```
+  - EXAMPLE
+    ```bash
+    curl -X GET "<BASEAPIURL>/user/{userId|username}/unfollow" -H "Authorization: Bearer {token}" -H "Content-Type: application/json"
     ```
 
 #### Get reels of user.
