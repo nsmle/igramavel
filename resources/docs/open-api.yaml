@@ -1,0 +1,576 @@
+openapi: '3.0.3'
+info:
+  title: Igramapi
+  description: |
+    An unofficial Instagram RESTful API. easy to fetch any feed and interact with Instagram (like, follow, etc.) with JWT implementation. 
+
+    If you login with your instagram credentials on [/auth/login](#/Auth/login) and get `Checkpoint required, please provide IMAP credentials to process authentication` error like problem [#1](https://github.com/nsmle/igramapi/issues/1) over and over again. Consider using an [alternative login](#/Auth/loginAlternative) with the Instagram sessionid cookie which you can get in [this tutorial](https://wpautomatic.com/how-to-get-instagram-session-id/) or [this one](https://skylens.io/blog/how-to-find-your-instagram-session-id).
+  license: 
+    name: MIT
+    url: https://github.com/nsmle/igramapi/blob/main/LICENSE
+  contact: 
+    name: nsmle
+    email: hello@fiki.tech
+  version: '1.0'
+
+servers:
+  - url: 'http://localhost:{port}/{version}'
+    description: Local
+    variables:
+      version:
+        enum:
+          - v1
+          - api
+        default: v1
+      port: 
+        enum:
+          - "8000"
+          - "8001"
+          - "8002"
+          - "8003"
+        default: "8000"
+  - url: '{protocol}://igramapi.fiki.tech/{version}'
+    description: Demo
+    variables:
+      version:
+        enum:
+          - v1
+          - api
+        default: v1
+      protocol: 
+        enum:
+          - http
+          - https
+        default: https
+
+
+externalDocs: 
+  description: Repository
+  url: https://github.com/nsmle/igramapi
+
+paths:
+  /auth/login:
+    post:
+      summary: Login with password
+      description: login with instagram username & password 
+      tags: 
+        - Auth
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: 
+              $ref: '#/components/schemas/Login'
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema: 
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request. Please login with your instagram credentials.
+        '401':
+          description: Unauthorize. Wrong login / password.
+                    
+  /auth/login/alternative:
+    post:
+      summary: Login with session id
+      description: Login with instagram cookie session id 
+      tags: 
+        - Auth
+      operationId: loginAlternative
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: 
+              $ref: '#/components/schemas/LoginAlternative'
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/LoginAlternative'
+          application/x-www-form-urlencoded:
+            schema: 
+              $ref: '#/components/schemas/LoginAlternative'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request. Please login with your instagram credentials.
+        '401':
+          description: Session expired, Please login with instagram credentials.
+  /user:
+    get:
+      summary: Get profile self
+      description: Get self user login profile 
+      tags: 
+        - Profile
+      operationId: profileSelf
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+  /user/{userId}:
+    get:
+      summary: Get profile by userId/username
+      description: Get user profile by instagram userId/username 
+      tags: 
+        - Profile
+      operationId: profileById
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: Instagram userId/username
+          example: "zuck"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+        '404':
+          description: Not Found, User <userId|username> not found!
+  /reels/{userId}:
+    get:
+      summary: Get reel feed of user
+      description: Get user reels by userId/username of instagram user 
+      tags: 
+        - Reels
+      operationId: reels
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: Instagram userId/username
+          example: "zuck"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+        '404':
+          description: Not Found, User <userId|username> not found!
+  
+  # Follow
+  /user/{userId}/follow:
+    post:
+      summary: Follow user by userId/username
+      description: Follow user by userId/username 
+      tags: 
+        - Follow
+      operationId: follow
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: Instagram userId/username
+          example: "zuck"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+        '404':
+          description: Not Found, User <userId|username> not found!
+  /user/{userId}/unfollow:
+    post:
+      summary: UnFollow user by userId/username
+      description: UnFollow user by userId/username 
+      tags: 
+        - Follow
+      operationId: unfollow
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: Instagram userId/username
+          example: "zuck"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+        '404':
+          description: Not Found, User <userId|username> not found!
+  
+  #### Comming Soon ####
+  /user/{userId}/followers:
+    get:
+      summary: Get user followers by userId/username
+      description: Get instagram user followers by userId/username 
+      tags: 
+        # - Follow
+        - Comming Soon!
+      operationId: followers
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: Instagram userId/username
+          example: "zuck"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+        '404':
+          description: Not Found, User <userId|username> not found!
+  /user/{userId}/followings:
+    get:
+      summary: Get user followings by userId/username
+      description: Get instagram user followings by userId/username 
+      tags: 
+        # - Follow
+        - Comming Soon!
+      operationId: followings
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: Instagram userId/username
+          example: "zuck"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+        '404':
+          description: Not Found, User <userId|username> not found!
+  /post/{userId}:
+    get:
+      summary: Get posts of user
+      description: Get user posts by userId/username of instagram user 
+      tags: 
+        # - Post
+        - Comming Soon!
+      operationId: post
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: Instagram userId/username
+          example: "zuck"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+        '404':
+          description: Not Found, User <userId|username> not found!
+  /post/{userId}/tags:
+    get:
+      summary: Get user posts tagged 
+      description: Get user posts tagged by userId/username of instagram user 
+      tags: 
+        # - Post
+        - Comming Soon!
+      operationId: postTags
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: Instagram userId/username
+          example: "zuck"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+        '404':
+          description: Not Found, User <userId|username> not found!
+  /post/{shortCode}/detail:
+    get:
+      summary: Get post detail 
+      description: Get post detail by postId/shortCode 
+      tags: 
+        # - Post
+        - Comming Soon!
+      operationId: postDetail
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      parameters:
+        - in: path
+          name: shortCode
+          schema:
+            type: string
+          required: true
+          description: Instagram postId/shortCode
+          example: "CGAvnLcA3zb"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+        '404':
+          description: Not Found, User <userId|username> not found!
+  /post/{shortCode}/comment:
+    get:
+      summary: Get comments of posts
+      description: Get comments of post by postId/shortCode 
+      tags: 
+        # - Post
+        - Comming Soon!
+      operationId: postComments
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      parameters:
+        - in: path
+          name: shortCode
+          schema:
+            type: string
+          required: true
+          description: Instagram postId/shortCode
+          example: "CGAvnLcA3zb"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+        '404':
+          description: Not Found, User <userId|username> not found!
+    post:
+      summary: Post a comment
+      description: Post a comment on media post by postId/shortCode 
+      tags: 
+        # - Post
+        - Comming Soon!
+      operationId: postComments
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      parameters:
+        - in: path
+          name: shortCode
+          schema:
+            type: string
+          required: true
+          description: Instagram postId/shortCode
+          example: "CGAvnLcA3zb"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: 
+              $ref: '#/components/schemas/PostComment'
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/PostComment'
+          application/x-www-form-urlencoded:
+            schema: 
+              $ref: '#/components/schemas/PostComment'
+        
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+        '404':
+          description: Not Found, User <userId|username> not found!
+  /post/{shortCode}/like:
+    post:
+      summary: Like a post 
+      description: Like a post by postId/shortCode 
+      tags: 
+        # - Post
+        - Comming Soon!
+      operationId: postLike
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      parameters:
+        - in: path
+          name: shortCode
+          schema:
+            type: string
+          required: true
+          description: Instagram postId/shortCode
+          example: "CGAvnLcA3zb"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+        '404':
+          description: Not Found, User <userId|username> not found!
+  /post/{shortCode}/unlike:
+    post:
+      summary: Unlike a post 
+      description: Unlike a post by postId/shortCode 
+      tags: 
+        # - Post
+        - Comming Soon!
+      operationId: postUnlike
+      security:
+        - BearerAuth: 
+          - '#/components/securitySchemes/BearerAuth'
+        - ApiKeyAuth: 
+          - '#/components/securitySchemes/ApiKeyAuth'
+      parameters:
+        - in: path
+          name: shortCode
+          schema:
+            type: string
+          required: true
+          description: Instagram postId/shortCode
+          example: "CGAvnLcA3zb"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Token not found!, Please send your token in all request or login if you not have token.
+        '401':
+          description: Token Invalid!
+        '404':
+          description: Not Found, User <userId|username> not found!
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer 
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: query
+      name: token
+
+  schemas:
+    Login:
+      type: object
+      properties: 
+        username:
+          type: string
+          example: 'YOUR_INSTAGRAM_USERNAME'
+        password:
+          type: string
+          example: 'YOUR_INSTAGRAM_PASSWORD'
+    LoginAlternative:
+      type: object
+      required: 
+        - value
+        - expires
+      properties: 
+        name:
+          type: string
+          example: 'sessionId'
+        value:
+          type: string
+          example: 'YOUR_INSTAGRAM_SESSIONID'
+        domain:
+          type: string
+          example: '.instagram.com'
+        path:
+          type: string
+          example: '/'
+        expires:
+          type: string
+          example: 'YOUR_INSTAGRAM_SESSIONID_EXPIRES'
+    PostComment:
+      type: object
+      required: 
+        - comment
+      properties: 
+        comment:
+          type: string
+          example: 'Awesome!'

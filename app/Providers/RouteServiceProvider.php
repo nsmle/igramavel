@@ -29,8 +29,12 @@ class RouteServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         $this->routes(function () {
+
+            $appVersion = config('app.version');
+
             Route::middleware('api')
-                ->prefix('api')
+                ->prefix($appVersion)
+                ->name('api.')
                 ->group(base_path('routes/api.php'));
 
             Route::middleware('web')

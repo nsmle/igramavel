@@ -32,8 +32,8 @@ class AuthenticateWithJwtAuth
     public function handle(Request $request, Closure $next)
     {
         $token = $request->bearerToken() ??
-                 $request->input('token') ??
-                 $request->cookie('token');
+            $request->input('token') ??
+            $request->cookie('token');
 
         if (!$token) {
             $exampleRequest = [
@@ -50,10 +50,10 @@ class AuthenticateWithJwtAuth
 
             return response()->json([
                 'status'  => 'Error',
-                'code'    => 401,
+                'code'    => 400,
                 'message' => 'Token not found!, Please send your token in all request or login if you not have token.',
                 'example'    => $exampleRequest
-            ], 401);
+            ], 400);
         }
 
         $authorized = $this->instagram->authorize($token);

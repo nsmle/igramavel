@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\InstagramRepository;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Crypt;
 use GuzzleHttp\Cookie\{SetCookie, CookieJar};
@@ -195,7 +196,7 @@ class InstagramService
         ])->cookie(
             'token',
             $this->generateToken(),
-            now()->parse(
+            now()->createFromTimestamp(
                 $session->getCookieByName('sessionId')->getExpires()
             )->diffInMinutes(),
             '/',

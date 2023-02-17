@@ -32,45 +32,15 @@ class ReelsController extends Controller
      * @return \Instagram\Model\Profile|string
      * @throw  \Exception
      */
-    public function __invoke(Request $request, mixed $userId): JsonResponse
+    public function feed(Request $request, mixed $userId): JsonResponse
     {
-        $reelsUserId = (int) $userId;
-        $reelsUserName = '';
         $cursor = $request->query('cursor');
-
-        if (!is_numeric($userId)) {
-            try {
-                $profile = $this->igram->Instagram->getProfile($userId);
-                $reelsUserName = $profile->getFullName();
-                $reelsUserId = $profile->getId();
-            } catch (\Exception $exception) {
-                preg_match('/404 Not Found/', $exception, $userNotFound);
-    
-                if (isset($userNotFound)) {
-                    return response()->json([
-                        'status'  => 'Not Found',
-                        'code'    => 404,
-                        'message' => "User {$userId} not found!",
-                        'errors'  => [
-                            'userId' => $userId
-                        ]
-                    ], 404);
-                }
-    
-                return response()->json([
-                    'status'  => 'Bad Request',
-                    'code'    => 400,
-                    'message' => $exception->getMessage(),
-                    'errors'  => [
-                        'userId' => $userId
-                    ]
-                ], 400);
-            }
-        }
+        $fullName = $request->get('userFullName');
+        $userName = $request->get('userUserName');
 
         if (empty($cursor)) {
             try {
-                $reelsFeed = $this->igram->Instagram->getReels($reelsUserId)->toArray();
+                $reelsFeed = $this->igram->Instagram->getReels($userId)->toArray();
             } catch (\Exception $exception) {
                 return response()->json([
                     'status'  => 'Unknown error',
@@ -80,7 +50,7 @@ class ReelsController extends Controller
             }
         } else {
             try {
-                $reelsFeed = $this->igram->Instagram->getReels($reelsUserId, $cursor)->toArray();
+                $reelsFeed = $this->igram->Instagram->getReels($userId, $cursor)->toArray();
             } catch (\Exception $exception) {
                 return response()->json([
                     'status'  => 'Cursor Invalid!',
@@ -93,8 +63,10 @@ class ReelsController extends Controller
             }
         }
 
+        $userNameMsg = !empty($fullName) ? $fullName : (!empty($userName) ? $userName : $userId);
+
         return $this->igram->jsonResponse($reelsFeed, [
-            "message" => "Reels Feed " . (!empty($reelsUserName) ? $reelsUserName : $reelsUserId)
+            "message" => "Reels Feed " . $userNameMsg
         ]);
     }
 }

@@ -44,9 +44,9 @@ class AuthController extends Controller
                 'message' => 'Please login with your instagram credentials.',
                 'errors'  => [
                     'username' => $validator->valid()['username'] ??
-                                  'YOUR_INSTAGRAM_USERNAME',
+                        'YOUR_INSTAGRAM_USERNAME',
                     'password' => $validator->valid()['password'] ??
-                                  'YOUR_INSTAGRAM_PASSWORD'
+                        'YOUR_INSTAGRAM_PASSWORD'
                 ]
             ], 400);
         }
@@ -58,7 +58,8 @@ class AuthController extends Controller
             $token = $this->instagram->login(
                 $credentials['username'],
                 $credentials['password'],
-                $credentials['imap'] ?? null);
+                $credentials['imap'] ?? null
+            );
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 'Error',
@@ -101,17 +102,11 @@ class AuthController extends Controller
                 'code'    => 400,
                 'message' => 'Please login with your instagram cookie sessionid.',
                 'errors'  => [
-                    'name'    => $validator->valid()['name'] == 'sessionid' ?
-                                 $validator->valid()['name'] :
-                                 'sessionid',
-                    'value'   => $validator->valid()['value'] ??
-                                 'YOUR_INSTAGRAM_SESSIONID',
-                    'domain'  => $validator->valid()['domain'] ??
-                                 '.instagram.com',
-                    'path'    => $validator->valid()['path'] ??
-                                 '/',
-                    'expires' => $validator->valid()['expires'] ??
-                                 'YOUR_INSTAGRAM_SESSIONID_EXPIRES',
+                    'name'    => $validator->valid()['name']    ?? 'sessionid',
+                    'value'   => $validator->valid()['value']   ?? 'YOUR_INSTAGRAM_SESSIONID',
+                    'domain'  => $validator->valid()['domain']  ?? '.instagram.com',
+                    'path'    => $validator->valid()['path']    ?? '/',
+                    'expires' => $validator->valid()['expires'] ?? 'YOUR_INSTAGRAM_SESSIONID_EXPIRES',
                 ]
             ], 400);
         }
