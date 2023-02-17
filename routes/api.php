@@ -20,22 +20,6 @@ use App\Http\Controllers\Api\{
 |
 */
 
-function CommingSoon()
-{
-    return response()->json([
-        'status'  => 'OK',
-        'code'    => 200,
-        'message' => 'Comming Soon!',
-        'data'    => [
-            'note' => 'Please see available api endpoints.',
-            'example' => [
-                'url'    => url(config('app.url')),
-                'method' => 'GET'
-            ]
-        ]
-    ], 200);
-}
-
 Route::middleware('guest')->group(function () {
     // Get all api endpoints.
     Route::get('/', function (Request $request) {
@@ -50,7 +34,7 @@ Route::middleware('guest')->group(function () {
     })->name('auth.');
 });
 
-Route::middleware(['auth.jwt', 'validate.username'])->group(function () {
+Route::middleware(['auth.jwt'])->group(function () {
 
     Route::prefix('user')->group(function () {
         Route::name('profile.')->group(function () {
@@ -60,14 +44,14 @@ Route::middleware(['auth.jwt', 'validate.username'])->group(function () {
             Route::get('/{userId}', [ProfileController::class, 'getProfileById'])->name('byUserId');
         });
 
-        Route::name('follow.')->group(function () {
+        Route::name('follow.')->middleware('validate.username')->group(function () {
             // Follow a user 
             Route::post("/{userId}/follow", [FollowController::class, 'follow'])->name('follow');
             Route::post("/{userId}/unfollow", [FollowController::class, 'unfollow'])->name('unfollow');
         });
     })->name('user.');
 
-    Route::prefix('reels')->group(function () {
+    Route::prefix('reels')->middleware('validate.username')->group(function () {
         // Get Reels of user
         Route::get('/{userId}', [ReelsController::class, 'feed'])->name('reels');
     })->name('reels.');
@@ -78,25 +62,25 @@ Route::middleware(['auth.jwt', 'validate.username'])->group(function () {
      */
     Route::prefix('post')->group(function () {
         Route::get("/{userId}", function () {
-            return CommingSoon();
+            return soon();
         })->name('posts');
         Route::get("/{userId}/tags", function () {
-            return CommingSoon();
+            return soon();
         })->name('tags');
         Route::get("/{shortCode}/detail", function () {
-            return CommingSoon();
+            return soon();
         })->name('details');
         Route::get("/{shortCode}/comment", function () {
-            return CommingSoon();
+            return soon();
         })->name('comments');
         Route::post("/{shortCode}/comment", function () {
-            return CommingSoon();
+            return soon();
         })->name('comment.post');
         Route::post("/{shortCode}/like", function () {
-            return CommingSoon();
+            return soon();
         })->name('like');
         Route::post("/{shortCode}/unlike", function () {
-            return CommingSoon();
+            return soon();
         })->name('unlike');
     })->name('post.');
 });

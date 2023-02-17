@@ -12,6 +12,15 @@ An unofficial Instagram RESTful API. easy  to fetch any feed and interact with I
 ## Information
 If you login with your instagram credentials on [/auth/login](https://github.com/nsmle/igramapi#login-with-instagram-credentials) and get `Checkpoint required, please provide IMAP credentials to process authentication` error like problem [#1](https://github.com/nsmle/igramapi/issues/1) over and over again. Consider using an [alternative login](https://github.com/nsmle/igramapi#login-with-instagram-cookie-sessionid) with the Instagram sessionid cookie which you can get in [this tutorial](https://wpautomatic.com/how-to-get-instagram-session-id/) or [this one](https://skylens.io/blog/how-to-find-your-instagram-session-id).
 
+> **Warning**
+> This project uses the [nsmle/instagram-user-feed](https://github.com/nsmle/instagram-user-feed) library instead of [pgrimaud/instagram-user-feed](https://github.com/pgrimaud/instagram-user-feed) now onwards. Because some of the [features developed](https://github.com/pgrimaud/instagram-user-feed/pull/330) and used in this project have not been accepted and I'm still trying to make changes to some of the features that might break.
+> 
+> If you are having trouble with this, you can delete lines [35-60](https://github.com/nsmle/igramapi/blob/main/composer.json#L35-L60) and replace line [69](https://github.com/nsmle/igramapi/blob/main/composer.json#L69) to:
+> ```json
+> "pgrimaud/instagram-user-feed": "^6.16.4"  // Or to a higher version, See: https://github.com/pgrimaud/instagram-user-feed/releases 
+> ```
+> in your `composer.json` file. Or if you have a solution to an existing problem, you can open an issue or make a pull request.
+
 ## Support <sub><sup>:heart:</sup></sub>
 If you like and find this app useful, please give your support by starring in this repository, or make a donation via [Saweria](https://saweria.co/nsmle) or : 
 

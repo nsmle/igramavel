@@ -14,13 +14,24 @@ info:
   version: '1.0'
 
 servers:
+  - url: '{protocol}://igramapi.fiki.tech/{version}'
+    description: Demo
+    variables:
+      version:
+        enum:
+          - v1
+        default: v1
+      protocol: 
+        enum:
+          - http
+          - https
+        default: https
   - url: 'http://localhost:{port}/{version}'
     description: Local
     variables:
       version:
         enum:
           - v1
-          - api
         default: v1
       port: 
         enum:
@@ -29,19 +40,6 @@ servers:
           - "8002"
           - "8003"
         default: "8000"
-  - url: '{protocol}://igramapi.fiki.tech/{version}'
-    description: Demo
-    variables:
-      version:
-        enum:
-          - v1
-          - api
-        default: v1
-      protocol: 
-        enum:
-          - http
-          - https
-        default: https
 
 
 externalDocs: 

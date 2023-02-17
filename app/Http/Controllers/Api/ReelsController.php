@@ -13,14 +13,14 @@ class ReelsController extends Controller
     /**
      * @var \App\Services\InstagramService
      */
-    private InstagramService $igram;
+    private InstagramService $instagram;
 
     /*
      * Initialization InstagramService
      */
     public function __construct()
     {
-        $this->igram = App::make(InstagramService::class);
+        $this->instagram = App::make(InstagramService::class);
     }
 
     /**
@@ -35,12 +35,12 @@ class ReelsController extends Controller
     public function feed(Request $request, mixed $userId): JsonResponse
     {
         $cursor = $request->query('cursor');
-        $fullName = $request->get('userFullName');
-        $userName = $request->get('userUserName');
+        $user = collect($request->get('user'));
+        $instagram = $this->instagram->Instagram;
 
         if (empty($cursor)) {
             try {
-                $reelsFeed = $this->igram->Instagram->getReels($userId)->toArray();
+                $reelsFeed = $instagram->getReels($userId)->toArray();
             } catch (\Exception $exception) {
                 return response()->json([
                     'status'  => 'Unknown error',
@@ -50,7 +50,7 @@ class ReelsController extends Controller
             }
         } else {
             try {
-                $reelsFeed = $this->igram->Instagram->getReels($userId, $cursor)->toArray();
+                $reelsFeed = $instagram->getReels($userId, $cursor)->toArray();
             } catch (\Exception $exception) {
                 return response()->json([
                     'status'  => 'Cursor Invalid!',
@@ -63,9 +63,9 @@ class ReelsController extends Controller
             }
         }
 
-        $userNameMsg = !empty($fullName) ? $fullName : (!empty($userName) ? $userName : $userId);
+        $userNameMsg = $user->contains('fullName') ? $user->get('fullName') : ($user->contains('userName') ? $user->get('userName') : $userId);
 
-        return $this->igram->jsonResponse($reelsFeed, [
+        return $this->instagram->jsonResponse($reelsFeed, [
             "message" => "Reels Feed " . $userNameMsg
         ]);
     }

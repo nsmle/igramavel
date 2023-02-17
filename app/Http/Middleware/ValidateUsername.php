@@ -38,17 +38,13 @@ class ValidateUsername
             if (!is_numeric($params['userId'])) {
                 try {
                     $username = $request->userId;
-                    $user = $this->instagram->Instagram->getProfile($username);
+                    $user = $this->instagram->Instagram
+                        ->getProfile($username)
+                        ->toArray();
+                    unset($user['medias'], $user['igtvs'], $user['endCursor'], $user['hasMoreMedias']);
 
-                    $request->route()->setParameter('userId', $user->getId());
-
-                    $request->attributes->add(['userId'             => $user->getId()]);
-                    $request->attributes->add(['userUserName'       => $user->getUserName()]);
-                    $request->attributes->add(['userFullName'       => $user->getFullName()]);
-                    $request->attributes->add(['userBiography'      => $user->getBiography()]);
-                    $request->attributes->add(['userProfilePicture' => $user->getProfilePicture()]);
-                    $request->attributes->add(['userPrivate'        => $user->isPrivate()]);
-                    $request->attributes->add(['userVerified'       => $user->isVerified()]);
+                    $request->route()->setParameter('userId', $user['id']);
+                    $request->attributes->add(["user" => $user]);
                 } catch (\Exception $exception) {
                     preg_match('/404 Not Found/', $exception, $userNotFound);
 

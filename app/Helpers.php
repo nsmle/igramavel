@@ -1,11 +1,12 @@
 <?php
 
 if (!function_exists('get_all_api_endpoint')) {
-    function get_all_api_endpoint() {
+    function get_all_api_endpoint()
+    {
         $igramHeadersCredentials = [
             'Authorization' => "Bearer <token>"
         ];
-        
+
         $igramEndpoint = [
             'get_all_endpoint' => [
                 'url'    => url('/api'),
@@ -119,7 +120,25 @@ if (!function_exists('get_all_api_endpoint')) {
                 ]
             ],
         ];
-        
+
         return $igramEndpoint;
+    }
+}
+
+if (!function_exists('soon')) {
+    function soon()
+    {
+        return response()->json([
+            'status'  => 'OK',
+            'code'    => 200,
+            'message' => 'Comming Soon!',
+            'data'    => [
+                'note' => 'Please see available api endpoints.',
+                'example' => [
+                    'url'    => url(config('app.url')),
+                    'method' => 'GET'
+                ]
+            ]
+        ], 200);
     }
 }

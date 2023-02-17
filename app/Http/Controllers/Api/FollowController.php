@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\{Request, JsonResponse};
-use Illuminate\Support\Facades\{App, Validator};
+use Illuminate\Support\Facades\App;
 use App\Services\InstagramService;
-use Illuminate\Support\Collection;
 
 class FollowController extends Controller
 {
@@ -30,41 +29,12 @@ class FollowController extends Controller
      * @param  string|int $userId
      *
      * @return \Illuminate\Http\JsonResponse
-     * 
-     * @throw  \Exception
      */
     public function follow(Request $request, mixed $userId): JsonResponse
     {
-        $user = [];
-        if (empty(($request->get('userUserName')))) {
-            $user = $this->ValidateUser($userId);
-            if ($user instanceof JsonResponse) return $user;
-        }
-
-        $userNameMsg = !empty($user['fullName']) ? $user['fullName'] : (!empty($request->get('userFullName')) ? $request->get('userFullName') : $userId);
-
-        try {
-            $isFollow = $this->instagram->Instagram->follow($userId) == 'ok';
-        } catch (\Exception $exception) {
-            return response()->json([
-                'status'  => 'Error',
-                'code'    => 400,
-                'message' => "Failed to follow $userNameMsg!" . $exception->getMessage(),
-                'errors'  => [
-                    'userId' => $userId,
-                    'follow' => false
-                ]
-            ], 400);
-        }
-
-        return $this->instagram->jsonResponse([
-            'userId' => !empty($user['userName']) ? $user['userName'] : (!empty($request->get('userUserName')) ? $request->get('userUserName') : $userId),
-            'isFollow' => $isFollow
-        ], [
-            "message" => "Successful follow $userNameMsg!"
-        ]);
+        $user = $request->get('user');
+        return $this->process($userId, 'follow', $user);
     }
-
 
     /**
      * Unfollow user by userId/username
@@ -73,83 +43,74 @@ class FollowController extends Controller
      * @param  string|int $userId
      *
      * @return \Illuminate\Http\JsonResponse
-     * 
-     * @throw  \Exception
      */
     public function unfollow(Request $request, mixed $userId): JsonResponse
     {
-        $user = [];
-        if (empty(($request->get('userUserName')))) {
-            $user = $this->ValidateUser($userId);
-            if ($user instanceof JsonResponse) return $user;
-        }
-
-        $userNameMsg = !empty($user['fullName']) ? $user['fullName'] : (!empty($request->get('userFullName')) ? $request->get('userFullName') : $userId);
-
-        try {
-            $isFollow = $this->instagram->Instagram->unfollow($userId) == 'ok';
-        } catch (\Exception $exception) {
-            return response()->json([
-                'status'  => 'Error',
-                'code'    => 400,
-                'message' => "Failed to unfollow $userNameMsg!" . $exception->getMessage(),
-                'errors'  => [
-                    'userId' => $userId,
-                    'unfollow' => false
-                ]
-            ], 400);
-        }
-
-        return $this->instagram->jsonResponse([
-            'userId' => !empty($user['userName']) ? $user['userName'] : (!empty($request->get('userUserName')) ? $request->get('userUserName') : $userId),
-            'unfollow' => $isFollow
-        ], [
-            "message" => "Successful unfollow $userNameMsg!"
-        ]);
+        $user = $request->get('user');
+        return $this->process($userId, 'unfollow', $user);
     }
 
-
-
-
     /**
-     * Validate username.
+     * Execute to follow/unfollow user.
      * 
      * @param  string|int $userId
+     * @param  string $action
      *
-     * @return array 
      * @return \Illuminate\Http\JsonResponse
      * 
      * @throw  \Exception
      */
-    private function ValidateUser(mixed $userId): array|JsonResponse
+    private function process(mixed $userId, string $action, array $user = null): JsonResponse
     {
         $userId = (int) $userId;
+        $user = collect($user);
+        $instagram = $this->instagram->Instagram;
+
+        if (!is_numeric($userId) && $user->isEmpty()) {
+            return response()->json([
+                'status'  => 'Internal Server Error',
+                'code'    => 500,
+                'message' => "Unknown error, Plase try again later! or report this problem on https://github.com/nsmle/igramapi/issues",
+                'errors'  => []
+            ], 500);
+        }
+
+        $userNameMsg = $user->contains('fullName') ? $user->get('fullName') : ($user->contains('userName') ? $user->get('userName') : $userId);
 
         try {
-            $user = $this->instagram->Instagram->getProfileById($userId);
-            return $user->toArray();
-        } catch (\Exception $exception) {
-            preg_match('/404 Not Found/', $exception, $userNotFound);
+            switch ($action) {
+                case 'follow':
+                    $data = ($instagram->follow($user->get('id') ?? $userId) == "ok");
+                    break;
 
-            if (isset($userNotFound)) {
-                return response()->json([
-                    'status'  => 'Not Found',
-                    'code'    => 404,
-                    'message' => "User {$userId} not found!",
-                    'errors'  => [
-                        'userId' => $userId
-                    ]
-                ], 404);
+                case 'unfollow':
+                    $data = ($instagram->unfollow($user->get('id') ?? $userId) == "ok");
+                    break;
+
+                default:
+                    return response()->json([
+                        'status'  => 'Internal Server Error',
+                        'code'    => 500,
+                        'message' => "Unknown error, Plase try again later! or report this problem on https://github.com/nsmle/igramapi/issues",
+                        'errors'  => []
+                    ], 500);
             }
-
+        } catch (\Exception $exception) {
             return response()->json([
-                'status'  => 'Bad Request',
+                'status'  => 'Error',
                 'code'    => 400,
-                'message' => $exception->getMessage(),
+                'message' => "Failed to $action $userNameMsg!" . $exception->getMessage(),
                 'errors'  => [
                     'userId' => $userId
                 ]
             ], 400);
         }
+
+        return $this->instagram->jsonResponse([
+            'userId' => !empty($user->get('userName')) ? "@" . $user->get('userName') : $userId,
+            $action  => $data
+        ], [
+            "message" => (in_array($action, ['follow', 'unfollow']) ? "Successful " : " ") . "$action $userNameMsg!"
+        ]);
     }
 }

@@ -12,14 +12,14 @@ class ProfileController extends Controller
     /**
      * @var \App\Services\InstagramService
      */
-    private InstagramService $igram;
+    private InstagramService $instagram;
 
     /*
      * Initialization InstagramService
      */
     public function __construct()
     {
-        $this->igram = App::make(InstagramService::class);
+        $this->instagram = App::make(InstagramService::class);
     }
 
     /**
@@ -33,10 +33,10 @@ class ProfileController extends Controller
      */
     public function getProfileSelf(Request $request): JsonResponse
     {
-        $userId = $this->igram->user->id;
+        $userId = $this->instagram->user->id;
 
         try {
-            $profile = $this->igram->Instagram->getProfileById($userId);
+            $profile = $this->instagram->Instagram->getProfileById($userId);
         } catch (\Exception $exception) {
             preg_match('/404 Not Found/', $exception, $userNotFound);
 
@@ -61,7 +61,7 @@ class ProfileController extends Controller
             ], 400);
         }
 
-        return $this->igram->jsonResponse([
+        return $this->instagram->jsonResponse([
             $profile->toArray()
         ], [
             "message" => "Logged in as {$profile->getFullName()}"
@@ -79,11 +79,13 @@ class ProfileController extends Controller
      */
     public function getProfileById(Request $request, mixed $userId): JsonResponse
     {
+        $instagram = $this->instagram->Instagram;
+
         try {
             if (is_numeric($userId)) {
-                $profile = $this->igram->Instagram->getProfileById($userId);
+                $profile = $instagram->getProfileById($userId);
             } else {
-                $profile = $this->igram->Instagram->getProfile($userId);
+                $profile = $instagram->getProfile($userId);
             }
         } catch (\Exception $exception) {
             preg_match('/404 Not Found/', $exception, $userNotFound);
@@ -109,7 +111,7 @@ class ProfileController extends Controller
             ], 400);
         }
 
-        return $this->igram->jsonResponse([
+        return $this->instagram->jsonResponse([
             $profile->toArray()
         ], [
             "message" => "Profile {$profile->getFullName()}"

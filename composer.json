@@ -27,11 +27,37 @@
     "homepage": "https://github.com/nsmle/igramapi",
     "authors": [
         {
-          "name": "Fiki Pratama",
-          "email": "fikiproductionofficial@gmail.com"
+            "name": "Fiki Pratama",
+            "email": "fikiproductionofficial@gmail.com"
         }
     ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "pgrimaud/instagram-user-feed",
+                "version": "master",
+                "source": {
+                    "url": "https://github.com/nsmle/instagram-user-feed.git",
+                    "type": "git",
+                    "reference": "master"
+                },
+                "autoload": {
+                    "psr-4": {
+                        "Instagram\\": "src/Instagram/"
+                    }
+                },
+                "require": {
+                    "php": ">=7.2.5",
+                    "ext-curl": "*",
+                    "ext-json": "*",
+                    "symfony/cache": "^3.4|^4.3|^5.0|^6.0",
+                    "guzzlehttp/guzzle": "^6.0|^7.0"
+                }
+            }
+        }
+    ],
     "require": {
         "php": "^8.0.2",
         "firebase/php-jwt": "^6.3",
@@ -39,8 +65,8 @@
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^2.14.1",
         "laravel/tinker": "^2.7",
-        "pgrimaud/instagram-user-feed": "^6.16",
-        "symfony/yaml": "^6.2"
+        "symfony/yaml": "^6.2",
+        "pgrimaud/instagram-user-feed": "master"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
